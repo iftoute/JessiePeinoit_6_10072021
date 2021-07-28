@@ -1,3 +1,4 @@
+// GESTION ET STOCKAGE DES FICHIERS IMAGE \\
 const multer = require('multer');
 
 const MIME_TYPES = {

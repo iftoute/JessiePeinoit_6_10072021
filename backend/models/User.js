@@ -1,7 +1,7 @@
 // MODELE DE DONNEES POUR LES UTILISATEURS \\
 
 const mongoose = require('mongoose');
-const uniqueValidator = require('mongoose-unique-validator')
+const uniqueValidator = require('mongoose-unique-validator'); // validation du champ unique
 
 const userSchema = mongoose.Schema({
     email : {type : String, required : true, unique: true},

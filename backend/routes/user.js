@@ -1,3 +1,4 @@
+// ROUTES VERS LE CONTROLLER USER.JS \\
 const express = require('express');
 const router = express.Router();
 const userCtrl = require('../controllers/user');
