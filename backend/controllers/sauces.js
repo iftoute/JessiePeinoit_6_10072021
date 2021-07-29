@@ -1,11 +1,16 @@
-// LOGIQUE DES REQUÊTES [C.R.U.D] \\
-//*********************************\\
+// LOGIQUE METIER DES ROUTES \\
+//****************************\\
 
+// import du modèle de données pour les sauces
 const Sauce = require('../models/Sauce');
+
+// import du package file system
 const fs = require('fs');
 
 // POST \\
 //******\\
+
+// créer une nouvelle sauce
 exports.createSauce = (req, res, next) => {
   const sauceObject = JSON.parse(req.body.sauce);
   delete sauceObject._id;
@@ -22,7 +27,7 @@ exports.createSauce = (req, res, next) => {
     .catch(error => res.status(400).json({ error}));
   };
 
-  
+// liker ou disliker une sauce
 exports.likeSauce = (req, res, next) => {   
   Sauce.findOne({_id: req.params.id})
   .then(sauce => { 
@@ -78,6 +83,8 @@ exports.likeSauce = (req, res, next) => {
 
 // PUT \\
 //******\\
+
+// modifier une sauce
 exports.modifySauce = (req, res, next) => {
   const sauceObject = req.file ?
   {
@@ -91,6 +98,8 @@ exports.modifySauce = (req, res, next) => {
 
 // DELETE  \\
 //**********\\
+
+// supprimer une sauce
 exports.deleteSauce = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id })
     .then(sauce => {
@@ -106,12 +115,15 @@ exports.deleteSauce = (req, res, next) => {
 
 // GET \\
 //******\\
+
+// afficher toutes les sauces
 exports.getAllSauces = (req, res, next) => {
   Sauce.find()
   .then(sauces => res.status(200).json(sauces))
   .catch(error => res.status(400).json({ error }));
 };
 
+// afficher une sauce
 exports.getOneSauce = (req, res, next) => {
   Sauce.findOne({ _id: req.params.id })
     .then(sauce => res.status(200).json(sauce))

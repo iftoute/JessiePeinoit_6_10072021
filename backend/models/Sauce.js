@@ -1,7 +1,7 @@
-/* MODELE DE DONNEES SAUCE */
-
+// import de mongoose
 const mongoose = require('mongoose');
 
+// modèle de données pour une sauce
 const sauceSchema = mongoose.Schema({
   userId: { type: String, required: true },
   name: { type: String, required: true },
@@ -16,4 +16,5 @@ const sauceSchema = mongoose.Schema({
   usersDisliked: { type: Array, required: true },
 });
 
+//export du modèle
 module.exports = mongoose.model('Sauce', sauceSchema);

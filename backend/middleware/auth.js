@@ -1,6 +1,7 @@
-// VERIFICATION DU TOKEN  \\
+// import de jsonwebtoken
 const jwt = require('jsonwebtoken');
 
+// vérification du token envoyé par le frontend
 module.exports = (req, res, next) => {
   try {
     const token = req.headers.authorization.split(' ')[1];
