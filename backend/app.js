@@ -13,6 +13,14 @@ const path = require('path');
 // import de helmet pour la protection des en-têtes HTTP
 const helmet = require('helmet');
 
+// impor t de rate-limit pour la protection contre les attaques de force brute
+const rateLimit = require('express-rate-limit');
+
+const  limiter  =  rateLimit ( { 
+  windowMs : 15  *  60  *  1000 ,  // 15 minutes 
+  max : 100  // limite chaque IP à 100 requêtes par windowMs
+});
+
 // import de dotenv pour cacher les données
 const dotenv = require('dotenv').config(); 
 
@@ -47,10 +55,10 @@ app.use(helmet());
 // permet d'accéder à la route pour les images
 app.use('/images', express.static(path.join(__dirname, 'images')));
 
-// permet d'acc"der aux routes pour les sauces
+// permet d'accéder aux routes pour les sauces
 app.use('/api/sauces', saucesRoutes);
 
-// permet d'acc"der aux routes pour les utilisateurs
+// permet d'accéder aux routes pour les utilisateurs
 app.use('/api/auth', userRoutes);
 
 // export de l'application
