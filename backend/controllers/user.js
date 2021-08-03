@@ -1,6 +1,5 @@
 // LOGIQUE DES ROUTES D'AUTHENTIFICATION \\
 
-// import du package bcrypt
 const bcrypt = require('bcrypt');
 
 // import dde jsonwebtoken pour créer des tokens et les vérifier
@@ -9,7 +8,6 @@ const jwt = require('jsonwebtoken');
 // import du modèle de données pour un utilisateur
 const User = require('../models/User');
 
-// import password validator
 const passwordValidator = require('password-validator');
 
 // création du schéma de validation du mot de passe
@@ -22,7 +20,8 @@ schemaPassword
 .has().uppercase()                              // Doit avoir une majuscule
 .has().lowercase()                              // Doit avoir une minuscule
 .has().digits(2)                                // Doit avoir au moins 2 chiffres
-.has().not().spaces();                           // Ne doit pas inclure d'espace
+.has().symbols(1)                               // Doit avoir nu caractère spécial
+.has().not().spaces();                          // Ne doit pas inclure d'espace
 
 // création d'un nouvel utilisateur
 exports.signup = (req, res, next) => {
@@ -40,7 +39,7 @@ exports.signup = (req, res, next) => {
     })
     .catch(error => res.status(500).json({ error }));
   } else {
-      throw 'Le mot de passe doit contenir entre 8 et 20 caractères dont au moins une majuscule, une minusucle et deux chiffres';
+      throw 'Le mot de passe doit contenir entre 8 et 20 caractères dont au moins une majuscule, une minusucle, deux chiffres et un caractère spécial';
   }
 };
 
@@ -62,7 +61,7 @@ exports.login = (req, res, next) => {
             userId: user._id,
             token: jwt.sign(
                 { userId: user._id },
-                'RANDOM_TOKEN_SECRET', // à modifier pour plus de sécurité
+                'RANDOM_TOKEN_SECRET',
                 { expiresIn: '24h' }
               )
           });

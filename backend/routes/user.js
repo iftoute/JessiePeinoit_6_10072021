@@ -1,4 +1,3 @@
-// import d'express
 const express = require('express');
 
 // création du router

@@ -21,6 +21,9 @@ const  limiter  =  rateLimit ( {
   max : 100  // limite chaque IP à 100 requêtes par windowMs
 });
 
+// import d'express-mongo-sanitize pour lutter contre les attaques par injection
+const mongoSanitize = require('express-mongo-sanitize');
+
 // import de dotenv pour cacher les données
 const dotenv = require('dotenv').config(); 
 
@@ -50,7 +53,12 @@ app.use((req, res, next) => {
 app.use(bodyParser.json());
 
 // permet de configurer les en-têtes HTTP de manière sécurisée
-app.use(helmet()); 
+app.use(helmet());
+
+// Permet de valider les entrées utilisateur et de remplacer les caractères interdits par "_" dans la base de données
+app.use(mongoSanitize({
+  replaceWith: '_'
+}));
 
 // permet d'accéder à la route pour les images
 app.use('/images', express.static(path.join(__dirname, 'images')));
