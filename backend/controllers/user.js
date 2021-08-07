@@ -2,11 +2,17 @@
 
 const bcrypt = require('bcrypt');
 
-// import dde jsonwebtoken pour créer des tokens et les vérifier
+// import de jsonwebtoken pour créer des tokens et les vérifier
 const jwt = require('jsonwebtoken');
 
 // import du modèle de données pour un utilisateur
 const User = require('../models/User');
+
+// import de validator pour valider les entrées utilisateurs
+const validator = require('validator');
+
+// import du module mongo-sanitize pour désinfecter les entrées contre les attaques par injection
+const sanitize = require('mongo-sanitize');
 
 const passwordValidator = require('password-validator');
 
@@ -25,34 +31,45 @@ schemaPassword
 
 // création d'un nouvel utilisateur
 exports.signup = (req, res, next) => {
-  // Si le mot de passe est conforme, il sera hashé pour être enregistré dans la base de données
-  if (schemaPassword.validate(req.body.password)) {
-    bcrypt.hash(req.body.password, 10)
-    .then(hash => {
-      const user = new User({
-        email: req.body.email,
-        password: hash
-      });
-      user.save()
-        .then(() => res.status(201).json({ message: 'Utilisateur créé !' }))
-        .catch(error => res.status(400).json({ error }));
-    })
-    .catch(error => res.status(500).json({ error }));
+  let email = sanitize(req.body.email);
+  let pass = sanitize(req.body.password);
+  let safeMail = Buffer.from(email).toString("base64");
+  if (validator.isEmail(email)) {
+    if (validator.isStrongPassword(pass)) {
+      bcrypt.hash(pass, 10)
+        .then((hash) => {
+          const user = new User({ 
+            email: safeMail, 
+            password: hash
+          });
+          user.save()
+            .then(() => res.status(201).json({ message: "Utilisateur créé!" }))
+            .catch((error) => res.status(400).json({ error }));
+        })
+        .catch((error) => res.status(500).json({ error }));
+    } else {
+      throw "Le mot de passe doit contenir entre 8 et 20 caractères dont au moins une majuscule, une minusucle, deux chiffres et un caractère spécial";
+    }
   } else {
-      throw 'Le mot de passe doit contenir entre 8 et 20 caractères dont au moins une majuscule, une minusucle, deux chiffres et un caractère spécial';
+    throw "Ceci n'est pas un email valide";
   }
 };
 
+
 // connexion d'un utilisateur déjà inscrit
 exports.login = (req, res, next) => {
-    // recherche le user dans la base de donnée qui correspond à l'adresse mail de la requête
-    User.findOne({ email: req.body.email })
+  let email = sanitize(req.body.email);
+  let pass = sanitize(req.body.password);
+  let mailSecure = Buffer.from(email).toString('base64');
+  if (validator.isEmail(email)) {
+  // recherche le user dans la base de donnée qui correspond à l'adresse mail de la requête
+  User.findOne({ email: mailSecure })
     .then(user => {
       if (!user) {
         return res.status(401).json({ error: 'Utilisateur non trouvé !' });
       }
       // si le user est trouvé, le mote de passe entré par l'utilisateur est comparé avec celui enregistré dans la base de données
-      bcrypt.compare(req.body.password, user.password)
+      bcrypt.compare(pass, user.password)
         .then(valid => {
           if (!valid) {
             return res.status(401).json({ error: 'Mot de passe incorrect !' });
@@ -69,4 +86,5 @@ exports.login = (req, res, next) => {
         .catch(error => res.status(500).json({ error }));
     })
     .catch(error => res.status(500).json({ error }));
+  }
 };
